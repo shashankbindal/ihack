@@ -6,8 +6,10 @@ services:
     region: singapore
     rootDir: prototype
     buildCommand: pip install -r requirements-app.txt
-    startCommand: streamlit run app/streamlit_app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true
-    healthCheckPath: /_stcore/health
+    startCommand: uvicorn src.api:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.5
+      - key: ALLOWED_ORIGINS
+        value: https://ihack.shashankbindal.me,http://localhost:5173,http://127.0.0.1:5173
