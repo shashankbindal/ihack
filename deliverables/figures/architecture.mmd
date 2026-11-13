@@ -1,0 +1,62 @@
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Arial, Helvetica, sans-serif", "fontSize": "18px", "primaryColor": "#EEF2F7", "primaryBorderColor": "#4A6178", "primaryTextColor": "#1F2A36", "lineColor": "#5B6B7B", "clusterBkg": "#FAFBFC", "clusterBorder": "#AAB6C2"}, "flowchart": {"curve": "basis", "nodeSpacing": 30, "rankSpacing": 45}}}%%
+flowchart LR
+    %% ---------- Offline data and training ----------
+    subgraph OFF["Offline: data, features, training (batch)"]
+        direction TB
+        SRC["Data sources<br/>Lender valuations &amp; loan collateral<br/>RERA, circle rates, registry<br/>OSM, Sentinel-2, building footprints<br/>NHB RESIDEX, RBI HPI, rates"]
+        ING["Ingestion DAGs<br/>Airflow / Prefect<br/>lineage: source, date, licence"]
+        CLN["Clean &amp; merge<br/>area basis, dedup, geocode,<br/>time-adjust, H3 join"]
+        LAKE[("Data lake<br/>Parquet + PostGIS<br/>versioned")]
+        TRN["Training &amp; validation<br/>LightGBM + spatial residual (M+)<br/>hedonic shadow, CQR calibration<br/>time + H3 block CV"]
+        REG[("Model registry<br/>MLflow, model cards,<br/>approvals")]
+        SRC --> ING --> CLN --> LAKE --> TRN --> REG
+    end
+
+    FS[("Feature store<br/>precomputed per H3 cell<br/>Parquet offline / Redis online")]
+    LAKE --> FS
+
+    %% ---------- Online valuation path ----------
+    subgraph ON["Online valuation path (target p95 under 2 s)"]
+        direction TB
+        API["Valuation API<br/>FastAPI, REST<br/>property attributes only, no PII"]
+        VAL["Validate &amp; geocode<br/>geo-precision flag"]
+        FEAT["Feature lookup<br/>by H3 cell + point distances"]
+        MOD["Model service<br/>M+ point estimate<br/>shadow hedonic model"]
+        CONF["Confidence layer<br/>conformal 80% interval<br/>OOD guard, grade A-D"]
+        XAI["Explainability<br/>TreeSHAP drivers,<br/>comparables"]
+        RTE["Routing engine<br/>lender policy rules<br/>LTV caps, loan-size rules"]
+        API --> VAL --> FEAT --> MOD --> CONF --> XAI --> RTE
+    end
+
+    LOS["Loan origination system"] --> API
+    RTE --> OUT["JSON + PDF report<br/>to LOS and underwriter dashboard"]
+    OUT --> LOS
+    FS --> FEAT
+    REG --> MOD
+
+    %% ---------- Governance and feedback ----------
+    subgraph GOV["Governance and feedback"]
+        direction TB
+        AUD[("Immutable audit log<br/>inputs, version, SHAP,<br/>routing, overrides")]
+        MON["Monitoring<br/>PSI drift, rolling error,<br/>coverage by city"]
+        HUM["Valuer and underwriter<br/>desktop review, field visit,<br/>overrides"]
+        BAT["Batch revaluation<br/>Spark / Dask, quarterly<br/>whole loan book"]
+    end
+
+    RTE --> AUD
+    AUD --> MON
+    MON -. "alert / roll back to champion" .-> REG
+    OUT --> HUM
+    HUM -. "new labels" .-> LAKE
+    REG --> BAT
+    FS --> BAT
+    BAT -. "LTV drift, early warning" .-> MON
+
+    classDef store fill:#E6ECF2,stroke:#4A6178,color:#1F2A36;
+    classDef online fill:#EAF3EC,stroke:#4E7A5A,color:#1F2A36;
+    classDef gov fill:#F6F0E6,stroke:#8A6D3B,color:#1F2A36;
+    classDef ext fill:#FFFFFF,stroke:#5B6B7B,color:#1F2A36,stroke-width:2px;
+    class LAKE,REG,FS,AUD store;
+    class API,VAL,FEAT,MOD,CONF,XAI,RTE online;
+    class MON,HUM,BAT gov;
+    class LOS,OUT ext;
