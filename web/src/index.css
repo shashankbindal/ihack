@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-canvas: #f8f9fa;
+  --color-surface: #ffffff;
+  --color-line: #e2e8f0;
+  --color-ink: #1e293b;
+  --color-muted: #64748b;
+  --color-brand: #e41e26;
+  --color-brand-dark: #c4161d;
+  --color-ok: #059669;
+  --color-ok-ink: #047857;
+  --color-ok-tint: #ecfdf5;
+  --color-warn: #d97706;
+  --color-warn-ink: #b45309;
+  --color-warn-tint: #fffbeb;
+  --color-bad: #dc2626;
+  --color-bad-ink: #b91c1c;
+  --color-bad-tint: #fef2f2;
+  --color-hover: #f1f5f9;
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+  }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  button,
+  select,
+  input {
+    font: inherit;
+  }
+}
+
+@layer utilities {
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+}
+
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #eef1f4;
+}
+
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  html,
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-full {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .avoid-break {
+    break-inside: avoid;
+  }
+}
