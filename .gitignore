@@ -4,8 +4,16 @@ __pycache__/
 *.log
 ~$*
 
-prototype/data/raw/
 prototype/results/cv_predictions.parquet
 
 submission/
 *Problem_Statements*.pdf
+
+!prototype/data/raw/
+prototype/data/raw/*
+!prototype/data/raw/listings/
+prototype/data/raw/listings/*
+!prototype/data/raw/listings/source.json
+!prototype/data/raw/osm/
+prototype/data/raw/osm/*
+!prototype/data/raw/osm/source.json

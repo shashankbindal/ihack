@@ -1,0 +1,18 @@
+{
+  "provider": "Geofabrik",
+  "licence": "ODbL 1.0",
+  "extracts": [
+    {
+      "zone": "southern-zone",
+      "url": "https://download.geofabrik.de/asia/india/southern-zone-latest.osm.pbf",
+      "file": "southern-zone-latest.osm.pbf",
+      "downloaded_at": "2026-11-12T16:52:42+00:00"
+    },
+    {
+      "zone": "western-zone",
+      "url": "https://download.geofabrik.de/asia/india/western-zone-latest.osm.pbf",
+      "file": "western-zone-latest.osm.pbf",
+      "downloaded_at": "2026-11-12T16:51:30+00:00"
+    }
+  ]
+}
