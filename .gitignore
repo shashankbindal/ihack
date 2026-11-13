@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.log
+~$*
+
+prototype/data/raw/
+prototype/results/cv_predictions.parquet
+
+submission/
+*Problem_Statements*.pdf
